@@ -33,9 +33,14 @@ private $conn;
 
 //Method used to add todo to the database
 
-  public function add($description,$created){
+  public function add($todo){
     $stmt=$this->conn->prepare("INSERT INTO todos (description,created) VALUES(:description,:created)");
-    $stmt->execute(['description'=>$description,'created'=>$created]);
+    //$stmt->execute(['description'=>$description,'created'=>$created]);
+    $stmt->execute($todo);
+    $todo['id']=$this->conn->lastInsertId();
+    return $todo;
+
+
   }
 //Method to delete record from the database
   public function delete($id){
@@ -50,13 +55,11 @@ private $conn;
 
   //Method to update todo record
 
-  public function update($id,$description,$created){
+  public function update($todo){
 
     $stmt=$this->conn->prepare("UPDATE todos SET description=:description,created=:created WHERE id=:id");
-    $stmt->bindParam(':id',$id);
-    $stmt->bindParam(':description',$description);
-    $stmt->bindParam(':created',$created);
-    $stmt->execute();
+    $stmt->execute($todo);
+    return $todo;
 
 
 

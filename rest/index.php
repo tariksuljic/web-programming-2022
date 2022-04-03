@@ -16,9 +16,7 @@ Flight::register('todoDao', 'TodoDao');
 
 Flight::route('GET /todos',function(){
 
-
-  $todos=Flight::todoDao()->get_all();
-  Flight::json($todos);
+  Flight::json(Flight::todoDao()->get_all());
 
 });
 
@@ -28,9 +26,7 @@ Flight::route('GET /todos',function(){
 */
 Flight::route('GET /todos/@id',function($id){
 
-
-  $todo=Flight::todoDao()->get_by_id($id);
-  Flight::json($todo);
+  Flight::json(Flight::todoDao()->get_by_id($id));
 
 });
 
@@ -39,10 +35,10 @@ Flight::route('GET /todos/@id',function($id){
 */
 Flight::route('POST /todos',function(){
 
+  print_r(Flight::request()->data->getData());
+  die;
 
-  $request = Flight::request();
-  $data=$request->data->getData();
-  Flight::todoDao()->add($data['description'],$data['created']);
+  Flight::json(Flight::todoDao()->add(Flight::request()->data->getData()));
 
 });
 
@@ -52,6 +48,16 @@ Flight::route('POST /todos',function(){
 *update todo
 
 */
+Flight::route('PUT /todos/@id',function($id){
+
+  $data=Flight::request()->data->getData();
+  $data['id']=$id;
+  Flight::json(Flight::todoDao()->update($data));
+
+
+});
+
+
 /**
 * delete todo
 
@@ -59,7 +65,7 @@ Flight::route('POST /todos',function(){
 Flight::route('DELETE /todos/@id',function($id){
 
 
-  $dao->delete($id);
+  Flight::todoDao()->delete($id);
   Flight::json(["message"=>"deleted"]);
 
 });
