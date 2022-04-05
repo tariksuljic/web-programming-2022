@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="js/carousel.js">
 
 
+
 </head>
 
 <body>
@@ -48,27 +49,9 @@
     <div class="container marketing" style="margin-top:100px;">
 
 
-      <div  id="todo-list" class="row">
+      <div id="todo-list" class="row">
 
-        <div class="col-lg-4">
-          <h2>Heading</h2>
-          <p>Some representative placeholder content for the three columns of text below the carousel. This is the first column.</p>
-          <p><a class="btn btn-secondary" href="#">View details &raquo;</a></p>
-        </div>
-
-
-        <div class="col-lg-4">
-          <h2>Heading</h2>
-          <p>Another exciting bit of representative placeholder content. This time, we've moved on to the second column.</p>
-          <p><a class="btn btn-secondary" href="#">View details &raquo;</a></p>
-        </div>
-
-
-        <div class="col-lg-4">
-          <h2></h2>
-          <p></p>
-          <p><a class="btn btn-secondary" href="#">View details &raquo;</a></p>
-        </div>
+        <span>Loading...</span>
 
       </div>
 
@@ -79,38 +62,119 @@
 
   </main>
 
+
+
 </body>
 
 <script src="js\jquery-3.6.0.min.js"></script>
+<script src="js\bootstrap.bundle.min.js"></script>
+
 
 <script>
-  $.get("rest/todos", function(data) {
 
-    $("#todo-list").html("");
+  getTodos();
 
-    var html = "";
-    for (let i = 0; i < data.length; i++) {
+  function getTodos(){
+    $.get("rest/todos", function(data) {
 
-      html += `
+      $("#todo-list").html("");
 
-      <div class="col-lg-4">
-        <h2>`+data[i].created+` </h2>
-        <p>`+data[i].description+`</p>
-        <p><a class="btn btn-secondary" href="#">View details &raquo;</a></p>
-      </div>`
+      var html = "";
+      for (let i = 0; i < data.length; i++) {
+
+        html += `
+
+        <div class="col-lg-4">
+          <h2>` + data[i].created + ` </h2>
+          <p>` + data[i].description + `</p>
+          <p>
+          <button type="button" class="btn btn-primary todo-button" onclick="showModal(`+data[i].id+`)" >
+            Launch demo modal
+          </button></p>
+        </div>`
 
 
-    }
+      }
 
-    $("#todo-list").html(html);
+      $("#todo-list").html(html);
 
 
-    console.log(data);
-    //alert("Load was performed.");
-  });
+      console.log(data);
+      //alert("Load was performed.");
+    });
+  }
+
+  function showModal(id) {
+
+    $('.todo-button').attr('diabled',true);
+
+    $.get('rest/todos/'+id,function(data){
+      console.log(data);
+      //$("#exampleModal .modal-body").html(id);
+      $("#description").val(data.description);
+      $("#created").val(data.created);
+      $("#id").val(data.id);
+      $("#exampleModal").modal("show");
+      $('.todo-button').attr('diabled',false);
+
+
+
+
+    })
+  }
+
+  function saveTodo(){
+
+    $(".save-todo").attr("disabled",true);
+
+    var todo={};
+    //todo.id=$('#id').val();
+    todo.description=$('#description').val();
+    todo.created=$('#created').val();
+
+
+        $.ajax({
+            url: 'rest/todos/'+$('#id').val(),
+            type: 'PUT',
+            data:JSON.stringify(todo),
+            contentType:"application/json",
+            dataType:"json",
+            success: function (result) {
+                $("#exampleModal").modal("hide");
+                $(".save-todo").attr("disabled",false);
+                $("#todo-list").html('<span>Loading...</span>')
+                getTodos();
+            }
+        });
+
+
+    console.log(todo);
+
+  }
 </script>
 
 
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="description"/>
+        <input type="hidden" id="created"/>
+        <input type="hidden" id="id"/>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary save-todo" onclick="saveTodo()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
