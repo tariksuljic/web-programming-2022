@@ -7,6 +7,11 @@
 
   <link href="css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="js/carousel.js">
+  <style >
+    .error{
+      color:red;
+    }
+  </style>
 
 
 
@@ -49,6 +54,8 @@
     <div class="container marketing" style="margin-top:100px;">
 
 
+      <button type="button" class="btn btn-success" onclick="showAddModal()">Add todo</button>
+
       <div id="todo-list" class="row">
 
         <span>Loading...</span>
@@ -68,13 +75,93 @@
 
 <script src="js\jquery-3.6.0.min.js"></script>
 <script src="js\bootstrap.bundle.min.js"></script>
+<script src="js\jquery.validate.min.js"></script>
 
+
+
+<!-- Modal -->
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <input type="text" id="description" />
+        <input type="hidden" id="created" />
+        <input type="hidden" id="id" />
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary save-todo" onclick="saveTodo()">Save changes</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="addModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <form id="addTodoForm" method="get">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Add todo</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+
+
+
+          <div class="mb-3">
+            <label >Description</label>
+            <input name="description" type="text" class="form-control required" placeholder="Enter user">
+
+          </div>
+          <div class="mb-3">
+            <label >Created</label>
+            <input name="created" type="date" class="form-control required" >
+          </div>
+
+
+
+
+
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="submit" class="btn btn-primary">Submit</button>
+
+      </div>
+      </form>
+    </div>
+  </div>
+</div>
 
 <script>
 
+  $("#addTodoForm").validate({
+  submitHandler: function(form) {
+    console.log($(form));
+    var todo=Object.fromEntries((new FormData(form)).entries());
+    $.ajax({
+      url: 'rest/todos',
+      type: 'POST',
+      data: JSON.stringify(todo),
+      contentType: "application/json",
+      dataType: "json",
+      success: function(result) {
+        $("#addModal").modal("hide");
+        getTodos();
+        console.log(result);
+      }
+    });
+  }
+ });
+
+
   getTodos();
 
-  function getTodos(){
+  function getTodos() {
     $.get("rest/todos", function(data) {
 
       $("#todo-list").html("");
@@ -88,9 +175,9 @@
           <h2>` + data[i].created + ` </h2>
           <p>` + data[i].description + `</p>
           <p>
-          <button type="button" class="btn btn-primary todo-button" onclick="showModal(`+data[i].id+`)" >
-            Launch demo modal
-          </button></p>
+          </p>
+          <button type="button" class="btn btn-primary todo-button" onclick="showModal(` + data[i].id + `)">Edit</button>
+          <button type="button" class="btn btn-danger todo-button" onclick="deleteTodo(` + data[i].id + `)">Delete</button>
         </div>`
 
 
@@ -106,16 +193,16 @@
 
   function showModal(id) {
 
-    $('.todo-button').attr('diabled',true);
+    $('.todo-button').attr('disabled', true);
 
-    $.get('rest/todos/'+id,function(data){
+    $.get('rest/todos/' + id, function(data) {
       console.log(data);
       //$("#exampleModal .modal-body").html(id);
       $("#description").val(data.description);
       $("#created").val(data.created);
       $("#id").val(data.id);
       $("#exampleModal").modal("show");
-      $('.todo-button').attr('diabled',false);
+      $('.todo-button').attr('disabled', false);
 
 
 
@@ -123,60 +210,81 @@
     })
   }
 
-  function saveTodo(){
+  function showAddModal() {
 
-    $(".save-todo").attr("disabled",true);
+    $('.todo-button').attr('disabled', true);
 
-    var todo={};
+    $("#addModal").modal("show");
+    $('.todo-button').attr('disabled', false);
+
+
+
+
+
+  }
+
+  function saveTodo() {
+
+    $(".save-todo").attr("disabled", true);
+
+    var todo = {};
     //todo.id=$('#id').val();
-    todo.description=$('#description').val();
-    todo.created=$('#created').val();
+    todo.description = $('#description').val();
+    todo.created = $('#created').val();
 
 
-        $.ajax({
-            url: 'rest/todos/'+$('#id').val(),
-            type: 'PUT',
-            data:JSON.stringify(todo),
-            contentType:"application/json",
-            dataType:"json",
-            success: function (result) {
-                $("#exampleModal").modal("hide");
-                $(".save-todo").attr("disabled",false);
-                $("#todo-list").html('<span>Loading...</span>')
-                getTodos();
-            }
-        });
+    $.ajax({
+      url: 'rest/todos/' + $('#id').val(),
+      type: 'PUT',
+      data: JSON.stringify(todo),
+      contentType: "application/json",
+      dataType: "json",
+      success: function(result) {
+        $("#exampleModal").modal("hide");
+        $(".save-todo").attr("disabled", false);
+        $("#todo-list").html('<span>Loading...</span>')
+        getTodos();
+        console.log(result);
+      }
+    });
 
 
     console.log(todo);
 
   }
+
+  function deleteTodo(id){
+    $.ajax({
+      url: 'rest/todos/'+id,
+      type: 'DELETE',
+      success: function(response) {
+          $('.todo-button').attr('disabled', true);
+        getTodos();
+      }
+    });
+  }
+
+/*  function addTodo() {
+
+    console.log("saved");
+    var data = {};
+    data.description = $("#add_description").val();
+    data.created = $("#add_created").val();
+    $.ajax({
+      url: 'rest/todos',
+      type: 'POST',
+      data: JSON.stringify(data),
+      contentType: "application/json",
+      dataType: "json",
+      success: function(result) {
+        $("#addModal").modal("hide");
+        getTodos();
+        console.log(result);
+      }
+    });
+    console.log(data);
+  }*/
 </script>
-
-
-
-<!-- Modal -->
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Modal title</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <input type="text" id="description"/>
-        <input type="hidden" id="created"/>
-        <input type="hidden" id="id"/>
-      </div>
-      <div class="modal-footer">
-        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-        <button type="button" class="btn btn-primary save-todo" onclick="saveTodo()">Save changes</button>
-      </div>
-    </div>
-  </div>
-</div>
-
-
 
 
 </html>

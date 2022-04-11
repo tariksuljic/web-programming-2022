@@ -35,8 +35,7 @@ Flight::route('GET /todos/@id',function($id){
 */
 Flight::route('POST /todos',function(){
 
-  print_r(Flight::request()->data->getData());
-  die;
+
 
   Flight::json(Flight::todoDao()->add(Flight::request()->data->getData()));
 
