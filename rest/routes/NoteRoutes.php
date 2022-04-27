@@ -14,11 +14,20 @@ Flight::route('GET /notes',function(){
 
 
 /**
-*List individual notes
+*List individual note
 */
 Flight::route('GET /notes/@id',function($id){
 
   Flight::json(Flight::noteService()->get_by_id($id));
+
+});
+
+/**
+*List individual note todos
+*/
+Flight::route('GET /notes/@id/todos',function($id){
+
+  Flight::json(Flight::todoService()->get_todos_by_note_id($id));
 
 });
 

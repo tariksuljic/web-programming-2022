@@ -3,7 +3,7 @@
 abstract class BaseService{
 
 
-  private $dao;
+  protected $dao;
 
 
   public function __construct($dao){
