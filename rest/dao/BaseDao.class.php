@@ -6,7 +6,7 @@ class BaseDao{
 private $conn;
 private $table_name;
 
-public function __construct(){
+public function __construct($table_name){
   $this->table_name=$table_name;
   $servername="127.0.0.1:3308";
   $username="todo";

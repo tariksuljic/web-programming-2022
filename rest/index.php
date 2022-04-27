@@ -3,71 +3,23 @@ ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
 error_reporting(E_ALL);
 
-require 'dao/TodoDao.class.php';
-require '../vendor/autoload.php';
-
-Flight::register('todoDao', 'TodoDao');
-
-//CRUD operations for todos entity
-
-/**
-* List all todos
-*/
-
-Flight::route('GET /todos',function(){
-
-  Flight::json(Flight::todoDao()->get_all());
-
-});
-
-
-/**
-*List individual todos
-*/
-Flight::route('GET /todos/@id',function($id){
-
-  Flight::json(Flight::todoDao()->get_by_id($id));
-
-});
-
-/**
-* add todo
-*/
-Flight::route('POST /todos',function(){
 
 
 
-  Flight::json(Flight::todoDao()->add(Flight::request()->data->getData()));
+require_once __DIR__.'/../vendor/autoload.php';
+require_once __DIR__.'/services/TodoService.class.php';
+require_once __DIR__.'/services/NoteService.class.php';
 
-});
-
-
-
-/**
-*update todo
-
-*/
-Flight::route('PUT /todos/@id',function($id){
-
-  $data=Flight::request()->data->getData();
-  $data['id']=$id;
-  Flight::json(Flight::todoDao()->update($data));
+Flight::register('todoService', 'TodoService');
+Flight::register('noteService', 'NoteService');
 
 
-});
+require_once __DIR__.'/routes/TodoRoutes.php';
+require_once __DIR__.'/routes/NoteRoutes.php';
 
 
-/**
-* delete todo
-
-*/
-Flight::route('DELETE /todos/@id',function($id){
 
 
-  Flight::todoDao()->delete($id);
-  Flight::json(["message"=>"deleted"]);
-
-});
 
 
 
