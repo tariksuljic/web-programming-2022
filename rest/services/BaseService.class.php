@@ -6,7 +6,7 @@ abstract class BaseService{
   private $dao;
 
 
-  public funtion __construct($dao){
+  public function __construct($dao){
     $this->dao=$dao;
   }
 

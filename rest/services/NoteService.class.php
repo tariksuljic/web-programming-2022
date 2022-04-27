@@ -1,8 +1,8 @@
 <?php
 
 
-require_once __DIR__.'/../services/BaseService.class.php'
-require_once __DIR__.'/../dao/NoteDao.class.php'
+require_once __DIR__.'/../services/BaseService.class.php';
+require_once __DIR__.'/../dao/NoteDao.class.php';
 
 class NoteService extends BaseService{
 

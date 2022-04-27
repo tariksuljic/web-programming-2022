@@ -22,7 +22,7 @@ public function __construct($table_name){
 
 public function get_all(){
 
-  $stmt=$this->conn->prepare("SELECT * FROM".$this->table_name);
+  $stmt=$this->conn->prepare("SELECT * FROM ".$this->table_name);
   $stmt->execute();
   return $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -93,21 +93,19 @@ public function get_by_id($id){
     return reset($results);
   }
 
-  //Method used to add todo to the database
-
-    public function add($entity){
-      return $this->add($entity);
-
-
-    }
-
-    //Method to update todo record
-
-    public function update($id,$entity){
-
-    return $this->update($entity);
-
-    }
+  // //Method used to add todo to the database
+  //
+  //   public function add_todo($entity){
+  //     return $this->add($entity);
+  //   }
+  //
+  //   //Method to update todo record
+  //
+  //   public function update_todo($id,$entity){
+  //
+  //   return $this->update($entity);
+  //
+  //   }
 
 
 }
